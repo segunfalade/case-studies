@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaaS Landing Page Teardown</title>
+    <title>Business Reportr - Landing Page Teardown</title>
     
     <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
@@ -17,8 +17,12 @@
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts: Dancing Script (Classy Cursive) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
     
-    <!-- Custom Styles for Animations -->
     <style>
         body { font-family: 'Inter', sans-serif; }
         .fade-in { animation: fadeIn 0.5s ease-in-out; }
@@ -28,15 +32,32 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .hotspot-pulse {
-            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-            animation: pulse-red 2s infinite;
+        /* Custom Highlight Styles */
+        .critique-highlight {
+            position: relative;
+            cursor: pointer;
+            text-decoration: underline;
+            text-decoration-style: dashed;
+            text-decoration-color: #ef4444; /* Red-500 */
+            text-decoration-thickness: 2px;
+            text-underline-offset: 4px;
+            transition: all 0.2s;
         }
 
-        @keyframes pulse-red {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        .critique-highlight:hover {
+            background-color: rgba(254, 202, 202, 0.3); /* Red-100 opacity */
+            text-decoration-style: solid;
+        }
+
+        .critique-highlight.active {
+            background-color: rgba(254, 202, 202, 0.5);
+            text-decoration-style: solid;
+            text-decoration-thickness: 3px;
+        }
+
+        /* Handwriting Font Class - Updated to Dancing Script */
+        .font-hand {
+            font-family: 'Dancing Script', cursive;
         }
     </style>
 </head>
@@ -44,118 +65,126 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useRef } = React;
+
+        // --- TEMPLATE CONFIGURATION ---
+        // Edit these values to customize the branding
+        const config = {
+            brandName: "Business Reportr",
+            authorImage: "https://copyinteractive.github.io/assets/profile.png",
+            authorName: "Teardown Expert"
+        };
 
         // --- ICONS ---
         const Icons = {
-            MessageCircle: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>,
-            Check: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
-            X: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
-            ArrowRight: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>,
-            Zap: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
-            AlertCircle: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+            MessageCircle: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>,
+            Check: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
+            ArrowRight: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>,
+            Zap: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+            X: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
+            Alert: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
         };
 
-        // --- DATA CONTENT ---
-        // This simulates the content of the page. You can edit this part to match your document.
-        const teardownData = {
-            hero: {
-                original: {
-                    headline: "We Provide Solutions For Your Business Growth",
-                    subhead: "Leverage our synergy to optimize your workflow and increase ROI effectively.",
-                    ctaPrimary: "Learn More",
-                    ctaSecondary: "Contact Sales",
-                    style: "bg-gray-200 text-center py-20 px-4",
-                    critiques: [
-                        {
-                            id: 1,
-                            top: "20%",
-                            left: "50%",
-                            title: "Vague Headline",
-                            desc: "The headline is generic. It doesn't tell the user *what* the tool actually does. 'Solutions' could mean anything.",
-                            fix: "Focus on the specific outcome."
-                        },
-                        {
-                            id: 2,
-                            top: "60%",
-                            left: "40%",
-                            title: "Conflicting CTAs",
-                            desc: "Giving two equal-weight buttons causes analysis paralysis. Users don't know which one to click.",
-                            fix: "Use one primary action color."
-                        }
-                    ]
-                },
-                improved: {
-                    headline: "Automate Your Client Reporting in 60 Seconds",
-                    subhead: "Stop wasting hours on spreadsheets. Connect your data and generate beautiful white-label reports instantly.",
-                    ctaPrimary: "Start Free Trial",
-                    ctaSecondary: "See Live Demo",
-                    style: "bg-gradient-to-br from-blue-600 to-indigo-700 text-white text-center py-24 px-4 shadow-xl"
-                }
+        // --- TEARDOWN DATA ---
+        // 1. Define your critique details here. Keys (e.g., 'headline') must match the ID you use in the HTML.
+        const critiques = {
+            headline: {
+                summary: "Too vague. Doesn't promise a result.",
+                title: "Vague Value Proposition",
+                description: "This headline uses generic corporate jargon ('Solutions', 'Growth'). Visitors spend 3 seconds deciding to stay; if they don't know what you do immediately, they bounce.",
+                fix: "State exactly what the tool does and the timeframe."
+            },
+            subhead: {
+                summary: "Buzzword overload.",
+                title: "Lack of Clarity",
+                description: "Words like 'synergy', 'optimize', and 'effectively' are filler. They don't explain *how* the tool helps.",
+                fix: "Use plain English. Explain the 'How'."
+            },
+            cta: {
+                summary: "Analysis paralysis.",
+                title: "Conflicting Calls to Action",
+                description: "Offering 'Learn More' (low intent) and 'Contact Sales' (high intent) with equal visual weight confuses the user.",
+                fix: "Choose one primary goal (Start Trial) and make it stand out."
             },
             features: {
-                original: {
-                    title: "Our Features",
-                    content: "We have cloud integration, API access, 24/7 support, multi-user login, and data export capabilities. Our system is robust and secure.",
-                    style: "bg-white py-16 px-4 max-w-4xl mx-auto",
-                    critiques: [
-                        {
-                            id: 3,
-                            top: "40%",
-                            left: "80%",
-                            title: "Wall of Text",
-                            desc: "Listing features in a paragraph makes them hard to scan. Users won't read this.",
-                            fix: "Use icons and grid layout."
-                        }
-                    ]
-                },
-                improved: {
-                    title: "Everything you need to scale",
-                    featuresList: [
-                        { icon: "Zap", title: "Instant Sync", desc: "Real-time data connection." },
-                        { icon: "Check", title: "API Access", desc: "Build custom workflows." },
-                        { icon: "MessageCircle", title: "24/7 Support", desc: "We are here when you need us." }
-                    ],
-                    style: "bg-white py-20 px-4 max-w-6xl mx-auto"
-                }
+                summary: "Hard to read.",
+                title: "Wall of Text",
+                description: "Users scan, they don't read. Burrying features in a paragraph guarantees they will be ignored.",
+                fix: "Break into bullet points with icons."
             }
+        };
+
+        // --- IMPROVED DATA ---
+        // Content for the "After" version
+        const improvedContent = {
+            headline: "Automate Client Reporting in 60 Seconds",
+            subhead: "Stop wasting hours on spreadsheets. Connect your data and generate beautiful white-label reports instantly.",
+            features: [
+                { icon: "Zap", title: "Instant Sync", desc: "Real-time data connection." },
+                { icon: "Check", title: "API Access", desc: "Build custom workflows." },
+                { icon: "MessageCircle", title: "24/7 Support", desc: "We are here when you need us." }
+            ]
         };
 
         // --- COMPONENTS ---
 
-        // 1. Tooltip/Hotspot Component
-        const Hotspot = ({ critique, activeId, onToggle }) => {
-            const isOpen = activeId === critique.id;
+        // 1. The Highlight Component (Wraps text)
+        const Highlight = ({ id, children, activeId, onSelect }) => {
+            const [isHovered, setIsHovered] = useState(false);
+            const isActive = activeId === id;
+            const data = critiques[id];
 
             return (
                 <div 
-                    className="absolute z-50 transform -translate-x-1/2 -translate-y-1/2"
-                    style={{ top: critique.top, left: critique.left }}
+                    className={`critique-highlight inline ${isActive ? 'active' : ''}`}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onSelect(isActive ? null : id);
+                    }}
                 >
-                    {/* The Pulse Dot */}
-                    <button 
-                        onClick={() => onToggle(critique.id)}
-                        className={`relative group flex items-center justify-center w-8 h-8 rounded-full shadow-lg transition-all duration-300 ${isOpen ? 'bg-red-600 text-white' : 'bg-white text-red-600 hover:bg-red-50'}`}
-                    >
-                        {isOpen ? <Icons.X /> : <span className="font-bold text-lg">?</span>}
-                        {!isOpen && <span className="absolute w-full h-full rounded-full bg-red-400 opacity-75 hotspot-pulse -z-10"></span>}
-                    </button>
-
-                    {/* The Critique Card */}
-                    {isOpen && (
-                        <div className="absolute top-10 left-0 w-72 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 text-left z-50 fade-in">
-                            <div className="flex items-center gap-2 mb-2 text-red-600 font-bold uppercase text-xs tracking-wider">
-                                <Icons.AlertCircle />
-                                <span>Problem Identified</span>
+                    {children}
+                    
+                    {/* Hover Summary Tooltip (Only shows if NOT active/clicked) */}
+                    {isHovered && !isActive && (
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white p-3 rounded-lg shadow-xl pointer-events-none z-50 flex items-start gap-2 font-hand text-xl leading-snug tracking-wide">
+                            <span className="mt-1 text-red-400 shrink-0"><Icons.Alert /></span>
+                            <div className="flex flex-col">
+                                <span>{data.summary}</span>
+                                <span className="text-xs text-gray-400 italic mt-1 font-sans">(click to read more)</span>
                             </div>
-                            <h3 className="font-bold text-gray-900 mb-1">{critique.title}</h3>
-                            <p className="text-sm text-gray-600 mb-3 leading-relaxed">{critique.desc}</p>
+                        </div>
+                    )}
+
+                    {/* Active Detail Card (Shows on Click) */}
+                    {isActive && (
+                        <div 
+                            className="absolute left-0 top-full mt-3 w-72 bg-white rounded-lg shadow-2xl border border-gray-200 z-50 text-left cursor-auto fade-in font-sans"
+                            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside card
+                        >
+                            {/* Arrow pointing up */}
+                            <div className="absolute -top-2 left-4 w-4 h-4 bg-white border-t border-l border-gray-200 transform rotate-45"></div>
                             
-                            <div className="bg-green-50 border-l-4 border-green-500 p-2">
-                                <p className="text-xs text-green-800 font-medium">
-                                    <span className="font-bold block mb-1">How to fix it:</span>
-                                    {critique.fix}
+                            <div className="p-4">
+                                <div className="flex justify-between items-start mb-2">
+                                    <h4 className="font-bold text-red-600 text-sm uppercase tracking-wide flex items-center gap-1">
+                                        <Icons.Alert /> Problem
+                                    </h4>
+                                    <button onClick={() => onSelect(null)} className="text-gray-400 hover:text-gray-600">
+                                        <Icons.X />
+                                    </button>
+                                </div>
+                                <h3 className="font-bold text-gray-900 text-lg mb-2">{data.title}</h3>
+                                <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+                                    {data.description}
                                 </p>
+                                <div className="bg-green-50 border-l-4 border-green-500 p-3 rounded-r">
+                                    <p className="text-xs text-green-800">
+                                        <span className="font-bold block mb-1">The Fix:</span>
+                                        {data.fix}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -166,170 +195,160 @@
         // 2. Main Application
         const App = () => {
             const [viewMode, setViewMode] = useState('original'); // 'original' or 'improved'
-            const [activeHotspot, setActiveHotspot] = useState(null);
-            const [showIntro, setShowIntro] = useState(true);
+            const [activeCritique, setActiveCritique] = useState(null);
 
-            // Toggle Hotspot
-            const toggleHotspot = (id) => {
-                if (activeHotspot === id) {
-                    setActiveHotspot(null);
-                } else {
-                    setActiveHotspot(id);
+            // Close critique if clicking background
+            useEffect(() => {
+                const handleClickOutside = () => setActiveCritique(null);
+                if (activeCritique) {
+                    window.addEventListener('click', handleClickOutside);
                 }
-            };
+                return () => window.removeEventListener('click', handleClickOutside);
+            }, [activeCritique]);
 
             return (
-                <div className="min-h-screen pb-24">
+                <div className="min-h-screen pb-32 font-sans">
                     
-                    {/* Floating Control Bar */}
-                    <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-40 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                            <span className="text-sm font-medium text-gray-500">Currently Viewing:</span>
-                            <div className="flex bg-gray-100 p-1 rounded-lg">
+                    {/* --- HEADER / CONTROLS --- */}
+                    <nav className="fixed top-0 left-0 w-full bg-white/90 backdrop-blur border-b border-gray-200 z-40 px-4 md:px-6 py-3 shadow-sm grid grid-cols-3 items-center">
+                        
+                        {/* Left: Brand Name */}
+                        <div className="font-bold text-gray-800 flex items-center gap-2 justify-start">
+                            <span className="bg-gray-900 text-white px-2 py-1 rounded text-xs tracking-wide font-sans">TEARDOWN</span>
+                            <span className="hidden sm:inline text-sm md:text-base">{config.brandName}</span>
+                        </div>
+                        
+                        {/* Center: Profile Image */}
+                        <div className="flex justify-center">
+                            <img 
+                                src={config.authorImage} 
+                                alt={config.authorName} 
+                                className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-white shadow-md object-cover bg-gray-200"
+                            />
+                        </div>
+                        
+                        {/* Right: Controls */}
+                        <div className="flex justify-end">
+                            <div className="bg-gray-100 p-1 rounded-lg flex text-xs md:text-sm font-medium">
                                 <button 
                                     onClick={() => setViewMode('original')}
-                                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${viewMode === 'original' ? 'bg-white shadow text-red-600' : 'text-gray-500 hover:text-gray-900'}`}
+                                    className={`px-3 py-1.5 md:px-4 md:py-2 rounded-md transition-all ${viewMode === 'original' ? 'bg-white shadow text-red-600' : 'text-gray-500 hover:text-gray-900'}`}
                                 >
-                                    Original (Teardown)
+                                    Critique
                                 </button>
                                 <button 
-                                    onClick={() => { setViewMode('improved'); setActiveHotspot(null); }}
-                                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${viewMode === 'improved' ? 'bg-indigo-600 shadow text-white' : 'text-gray-500 hover:text-gray-900'}`}
+                                    onClick={() => { setViewMode('improved'); setActiveCritique(null); }}
+                                    className={`px-3 py-1.5 md:px-4 md:py-2 rounded-md transition-all ${viewMode === 'improved' ? 'bg-indigo-600 shadow text-white' : 'text-gray-500 hover:text-gray-900'}`}
                                 >
-                                    Improved Version
+                                    Improved
                                 </button>
                             </div>
                         </div>
+                    </nav>
+
+                    {/* --- MAIN CONTENT AREA --- */}
+                    <main className="mt-24">
                         
-                        {viewMode === 'original' && (
-                            <p className="text-xs text-gray-500 animate-pulse hidden sm:block">
-                                Click the pulsing <span className="font-bold text-red-500">?</span> icons to see the critique.
-                            </p>
-                        )}
-                    </div>
-
-                    {/* --- HERO SECTION --- */}
-                    <section className={`relative transition-all duration-500 ${viewMode === 'original' ? teardownData.hero.original.style : teardownData.hero.improved.style}`}>
-                        
-                        {/* Hotspots for Hero (Only show in original mode) */}
-                        {viewMode === 'original' && teardownData.hero.original.critiques.map(c => (
-                            <Hotspot 
-                                key={c.id} 
-                                critique={c} 
-                                activeId={activeHotspot} 
-                                onToggle={toggleHotspot} 
-                            />
-                        ))}
-
-                        <div className="max-w-4xl mx-auto relative z-10">
-                            {viewMode === 'original' ? (
-                                // Original Content
-                                <div className="space-y-6 fade-in">
-                                    <h1 className="text-4xl font-serif font-bold text-gray-800">{teardownData.hero.original.headline}</h1>
-                                    <p className="text-lg text-gray-600">{teardownData.hero.original.subhead}</p>
-                                    <div className="flex justify-center gap-4 mt-8">
-                                        <button className="bg-gray-800 text-white px-6 py-3 rounded uppercase tracking-widest text-sm hover:bg-gray-700">
-                                            {teardownData.hero.original.ctaPrimary}
-                                        </button>
-                                        <button className="bg-transparent border-2 border-gray-800 text-gray-800 px-6 py-3 rounded uppercase tracking-widest text-sm hover:bg-gray-100">
-                                            {teardownData.hero.original.ctaSecondary}
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : (
-                                // Improved Content
-                                <div className="space-y-8 fade-in text-center">
-                                    <div className="inline-block px-4 py-1 rounded-full bg-indigo-500/30 border border-indigo-400/50 text-indigo-100 text-sm font-medium mb-4">
-                                        🚀 New: AI-Powered Reporting
-                                    </div>
-                                    <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight">
-                                        {teardownData.hero.improved.headline}
-                                    </h1>
-                                    <p className="text-xl text-indigo-100 max-w-2xl mx-auto">
-                                        {teardownData.hero.improved.subhead}
-                                    </p>
-                                    <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
-                                        <button className="bg-white text-indigo-600 px-8 py-4 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center gap-2">
-                                            {teardownData.hero.improved.ctaPrimary} <Icons.ArrowRight />
-                                        </button>
-                                        <button className="text-indigo-100 hover:text-white underline underline-offset-4">
-                                            {teardownData.hero.improved.ctaSecondary}
-                                        </button>
-                                    </div>
-                                    <p className="text-sm text-indigo-200 mt-4">No credit card required · 14-day free trial</p>
-                                </div>
-                            )}
-                        </div>
-                    </section>
-
-
-                    {/* --- FEATURES SECTION --- */}
-                    <section className={`relative transition-all duration-500 border-b border-gray-200 ${viewMode === 'original' ? 'bg-gray-100 py-16' : 'bg-white py-24'}`}>
-                        
-                        {/* Hotspots for Features */}
-                        {viewMode === 'original' && teardownData.features.original.critiques.map(c => (
-                            <Hotspot 
-                                key={c.id} 
-                                critique={c} 
-                                activeId={activeHotspot} 
-                                onToggle={toggleHotspot} 
-                            />
-                        ))}
-
-                        <div className="max-w-6xl mx-auto px-4">
-                            {viewMode === 'original' ? (
-                                // Original Features
-                                <div className="text-center max-w-2xl mx-auto fade-in">
-                                    <h2 className="text-2xl font-bold mb-4">{teardownData.features.original.title}</h2>
-                                    <p className="text-gray-600 leading-loose text-justify">
-                                        {teardownData.features.original.content}
-                                    </p>
-                                </div>
-                            ) : (
-                                // Improved Features
-                                <div className="fade-in">
-                                    <div className="text-center mb-16">
-                                        <h2 className="text-3xl font-bold text-gray-900">{teardownData.features.improved.title}</h2>
-                                    </div>
-                                    <div className="grid md:grid-cols-3 gap-8">
-                                        {teardownData.features.improved.featuresList.map((f, i) => (
-                                            <div key={i} className="bg-white p-8 rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-shadow">
-                                                <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center mb-6">
-                                                    {f.icon === 'Zap' && <Icons.Zap />}
-                                                    {f.icon === 'Check' && <Icons.Check />}
-                                                    {f.icon === 'MessageCircle' && <Icons.MessageCircle />}
+                        {/* SECTION: HERO */}
+                        <section className={`transition-all duration-500 ${viewMode === 'original' ? 'bg-gray-200 py-20' : 'bg-gradient-to-br from-blue-600 to-indigo-700 py-24 shadow-xl'}`}>
+                            <div className="max-w-4xl mx-auto px-6 text-center">
+                                
+                                {viewMode === 'original' ? (
+                                    /* ORIGINAL (With Highlights) */
+                                    <div className="fade-in space-y-6">
+                                        <div className="text-4xl font-serif font-bold text-gray-800 leading-tight">
+                                            {/* WRAPPING TEXT IN HIGHLIGHT COMPONENT */}
+                                            <Highlight id="headline" activeId={activeCritique} onSelect={setActiveCritique}>
+                                                We Provide Solutions For Your Business Growth
+                                            </Highlight>
+                                        </div>
+                                        <div className="text-lg text-gray-600 max-w-2xl mx-auto">
+                                            <Highlight id="subhead" activeId={activeCritique} onSelect={setActiveCritique}>
+                                                Leverage our synergy to optimize your workflow and increase ROI effectively.
+                                            </Highlight>
+                                        </div>
+                                        <div className="flex justify-center gap-4 mt-8">
+                                            <Highlight id="cta" activeId={activeCritique} onSelect={setActiveCritique}>
+                                                <div className="flex gap-4">
+                                                    <button className="bg-gray-800 text-white px-6 py-3 rounded uppercase tracking-widest text-sm pointer-events-none">
+                                                        Learn More
+                                                    </button>
+                                                    <button className="bg-transparent border-2 border-gray-800 text-gray-800 px-6 py-3 rounded uppercase tracking-widest text-sm pointer-events-none">
+                                                        Contact Sales
+                                                    </button>
                                                 </div>
-                                                <h3 className="text-xl font-bold text-gray-900 mb-2">{f.title}</h3>
-                                                <p className="text-gray-500">{f.desc}</p>
-                                            </div>
-                                        ))}
+                                            </Highlight>
+                                        </div>
                                     </div>
-                                </div>
-                            )}
-                        </div>
-                    </section>
-
-                    {/* Intro Modal (Dismissible) */}
-                    {showIntro && (
-                        <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-                            <div className="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl">
-                                <h2 className="text-2xl font-bold mb-2">Welcome to the Teardown</h2>
-                                <p className="text-gray-600 mb-6">
-                                    This is an interactive analysis of a SaaS landing page. 
-                                    <br/><br/>
-                                    1. Look for the <span className="text-red-500 font-bold">?</span> markers to see what's wrong.
-                                    <br/>
-                                    2. Switch to the <strong>"Improved Version"</strong> to see the solution.
-                                </p>
-                                <button 
-                                    onClick={() => setShowIntro(false)}
-                                    className="w-full bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors"
-                                >
-                                    Start Analysis
-                                </button>
+                                ) : (
+                                    /* IMPROVED */
+                                    <div className="fade-in space-y-8">
+                                        <div className="inline-block px-4 py-1 rounded-full bg-indigo-500/30 border border-indigo-400/50 text-indigo-100 text-sm font-medium mb-4">
+                                            🚀 New: AI-Powered Reporting
+                                        </div>
+                                        <h1 className="text-5xl md:text-6xl font-extrabold text-white tracking-tight leading-tight">
+                                            {improvedContent.headline}
+                                        </h1>
+                                        <p className="text-xl text-indigo-100 max-w-2xl mx-auto">
+                                            {improvedContent.subhead}
+                                        </p>
+                                        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
+                                            <button className="bg-white text-indigo-600 px-8 py-4 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center gap-2">
+                                                Start Free Trial <Icons.ArrowRight />
+                                            </button>
+                                            <button className="text-indigo-100 hover:text-white underline underline-offset-4">
+                                                See Live Demo
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                        </div>
-                    )}
+                        </section>
+
+                        {/* SECTION: FEATURES */}
+                        <section className={`transition-all duration-500 border-b border-gray-200 ${viewMode === 'original' ? 'bg-gray-100 py-16' : 'bg-white py-24'}`}>
+                            <div className="max-w-6xl mx-auto px-6">
+                                {viewMode === 'original' ? (
+                                    <div className="text-center max-w-2xl mx-auto fade-in">
+                                        <h2 className="text-2xl font-bold mb-4 text-gray-800">Our Features</h2>
+                                        <div className="text-gray-600 leading-loose text-justify bg-white p-6 shadow-sm border border-gray-200">
+                                            <Highlight id="features" activeId={activeCritique} onSelect={setActiveCritique}>
+                                                We have cloud integration, API access, 24/7 support, multi-user login, and data export capabilities. Our system is robust and secure.
+                                            </Highlight>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="fade-in">
+                                        <div className="text-center mb-16">
+                                            <h2 className="text-3xl font-bold text-gray-900">Everything you need to scale</h2>
+                                        </div>
+                                        <div className="grid md:grid-cols-3 gap-8">
+                                            {improvedContent.features.map((f, i) => (
+                                                <div key={i} className="bg-white p-8 rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-shadow">
+                                                    <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center mb-6">
+                                                        {f.icon === 'Zap' && <Icons.Zap />}
+                                                        {f.icon === 'Check' && <Icons.Check />}
+                                                        {f.icon === 'MessageCircle' && <Icons.MessageCircle />}
+                                                    </div>
+                                                    <h3 className="text-xl font-bold text-gray-900 mb-2">{f.title}</h3>
+                                                    <p className="text-gray-500">{f.desc}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </section>
+
+                    </main>
+
+                    {/* Footer / Instructions */}
+                    <div className="fixed bottom-0 w-full bg-white border-t border-gray-200 p-3 text-center text-xs text-gray-400 z-50">
+                        {viewMode === 'original' ? 
+                            "Hover over underlined text for a summary. Click for details." : 
+                            "Viewing improved version."
+                        }
+                    </div>
 
                 </div>
             );
