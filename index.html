@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics (Preserved) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7MCXMFE92D"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-7MCXMFE92D');
+    </script>
+    
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Segun Falade - SaaS Copywriter helping startups turn curious visitors into converted users.">
+    <title>Segun Falade | SaaS Copywriter</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="https://copyinteractive.github.io/assets/profile.png" type="image/png">
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Tech/SaaS Palette */
+            --text-main: #0f172a;    
+            --bg-color: #ffffff;
+            --grid-color: #e2e8f0;   
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-main);
+            /* SaaS Grid Background Pattern */
+            background-image: 
+                radial-gradient(at 80% 0%, rgba(51, 102, 204, 0.05) 0px, transparent 50%),
+                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+            min-height: 100vh;
+        }
+        
+        h1, h2, h3, h4, button, .font-brand { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Teardown Specific Styles */
+        .critique-highlight {
+            position: relative;
+            cursor: pointer;
+            text-decoration: underline;
+            text-decoration-style: dashed;
+            text-decoration-color: #ef4444;
+            text-decoration-thickness: 2px;
+            text-underline-offset: 4px;
+            transition: all 0.2s;
+        }
+        .critique-highlight:hover { background-color: rgba(254, 202, 202, 0.3); text-decoration-style: solid; }
+        .critique-highlight.active { background-color: rgba(254, 202, 202, 0.5); text-decoration-style: solid; text-decoration-thickness: 3px; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- GLOBAL CONFIG & LINKS ---
+        const config = {
+            authorName: "Segun Falade",
+            authorRole: "SaaS Copywriter",
+            authorImage: "https://copyinteractive.github.io/assets/profile.png",
+            links: {
+                portfolio: "https://www.canva.com/design/DAG6_flilIk/-uBKMjKdwWj4i-hXNELD4g/view?utm_content=DAG6_flilIk&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h8bcff8982c",
+                substack: "https://curious2converted.substack.com",
+                calendly: "https://calendly.com/segunfalade/discovery-call",
+                linkedin: "https://linkedin.com/in/segunfaladey",
+                x: "https://x.com/shegston"
+            }
+        };
+
+        // --- ICONS COMPONENT MAP ---
+        const Icons = {
+            LayoutGrid: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>,
+            ArrowLeft: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>,
+            ArrowRight: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>,
+            Alert: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>,
+            X: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
+            Zap: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+            Check: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
+            MessageCircle: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>,
+            ChevronDown: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>,
+            FileText: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>,
+            BarChart: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>,
+            BookOpen: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>,
+            PenTool: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19 7-7 3 3-7 7-3-3z"/><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="m2 2 7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+        };
+
+        // --- SUB-COMPONENTS ---
+        const Highlight = ({ id, children, activeId, onSelect, critiques }) => {
+            const [isHovered, setIsHovered] = useState(false);
+            const isActive = activeId === id;
+            const data = critiques[id];
+
+            return (
+                <div 
+                    className={`critique-highlight inline ${isActive ? 'active' : ''}`}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onSelect(isActive ? null : id);
+                    }}
+                >
+                    {children}
+                    
+                    {isHovered && !isActive && (
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-56 bg-gray-900 text-white p-3 rounded-lg shadow-xl pointer-events-none z-50 flex items-start gap-2 font-sans text-sm leading-snug">
+                            <span className="mt-0.5 text-red-400 shrink-0"><Icons.Alert /></span>
+                            <div className="flex flex-col">
+                                <span>{data.summary}</span>
+                                <span className="text-xs text-gray-400 italic mt-1">(click to read more)</span>
+                            </div>
+                        </div>
+                    )}
+
+                    {isActive && (
+                        <div 
+                            className="absolute left-0 top-full mt-3 w-72 bg-white rounded-lg shadow-2xl border border-gray-200 z-50 text-left cursor-auto fade-in font-sans"
+                            onClick={(e) => e.stopPropagation()} 
+                        >
+                            <div className="absolute -top-2 left-4 w-4 h-4 bg-white border-t border-l border-gray-200 transform rotate-45"></div>
+                            <div className="p-4">
+                                <div className="flex justify-between items-start mb-2">
+                                    <h4 className="font-bold text-red-600 text-sm uppercase tracking-wide flex items-center gap-1">
+                                        <Icons.Alert /> Problem
+                                    </h4>
+                                    <button onClick={() => onSelect(null)} className="text-gray-400 hover:text-gray-600">
+                                        <Icons.X />
+                                    </button>
+                                </div>
+                                <h3 className="font-bold text-gray-900 text-lg mb-2">{data.title}</h3>
+                                <p className="text-gray-600 text-sm mb-4 leading-relaxed">{data.description}</p>
+                                <div className="bg-green-50 border-l-4 border-green-500 p-3 rounded-r">
+                                    <p className="text-xs text-green-800">
+                                        <span className="font-bold block mb-1">The Fix:</span>
+                                        {data.fix}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // --- TEARDOWN 1: BUSINESS REPORTR ---
+        const TeardownBusinessReportr = ({ onBack }) => {
+            const [viewMode, setViewMode] = useState('original');
+            const [activeCritique, setActiveCritique] = useState(null);
+
+            useEffect(() => {
+                const handleClickOutside = () => setActiveCritique(null);
+                if (activeCritique) {
+                    window.addEventListener('click', handleClickOutside);
+                }
+                return () => window.removeEventListener('click', handleClickOutside);
+            }, [activeCritique]);
+
+            const critiques = {
+                headline: {
+                    summary: "Too vague. Doesn't promise a result.",
+                    title: "Vague Value Proposition",
+                    description: "This headline uses generic corporate jargon ('Solutions', 'Growth'). Visitors spend 3 seconds deciding to stay; if they don't know what you do immediately, they bounce.",
+                    fix: "State exactly what the tool does and the timeframe."
+                },
+                subhead: {
+                    summary: "Buzzword overload.",
+                    title: "Lack of Clarity",
+                    description: "Words like 'synergy', 'optimize', and 'effectively' are filler. They don't explain *how* the tool helps.",
+                    fix: "Use plain English. Explain the 'How'."
+                },
+                cta: {
+                    summary: "Analysis paralysis.",
+                    title: "Conflicting Calls to Action",
+                    description: "Offering 'Learn More' (low intent) and 'Contact Sales' (high intent) with equal visual weight confuses the user.",
+                    fix: "Choose one primary goal (Start Trial) and make it stand out."
+                },
+                features: {
+                    summary: "Hard to read.",
+                    title: "Wall of Text",
+                    description: "Users scan, they don't read. Burrying features in a paragraph guarantees they will be ignored.",
+                    fix: "Break into bullet points with icons."
+                }
+            };
+
+            const improvedContent = {
+                headline: "Automate Client Reporting in 60 Seconds",
+                subhead: "Stop wasting hours on spreadsheets. Connect your data and generate beautiful white-label reports instantly.",
+                features: [
+                    { icon: "Zap", title: "Instant Sync", desc: "Real-time data connection." },
+                    { icon: "Check", title: "API Access", desc: "Build custom workflows." },
+                    { icon: "MessageCircle", title: "24/7 Support", desc: "We are here when you need us." }
+                ]
+            };
+
+            return (
+                <div className="bg-white min-h-screen relative font-sans">
+                    <nav className="sticky top-0 left-0 w-full bg-white/95 backdrop-blur border-b border-gray-200 z-40 px-6 py-4 shadow-sm flex justify-between items-center">
+                        <button onClick={onBack} className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors text-sm font-medium group">
+                            <span className="bg-gray-100 p-1.5 rounded-md group-hover:bg-gray-200"><Icons.ArrowLeft /></span>
+                            <span>Back to Portfolio</span>
+                        </button>
+                        <div className="hidden md:block font-bold text-gray-800 font-brand">Business Reportr Analysis</div>
+                        <div className="flex bg-gray-100 p-1 rounded-lg text-xs font-medium">
+                            <button onClick={() => setViewMode('original')} className={`px-4 py-2 rounded-md transition-all ${viewMode === 'original' ? 'bg-white shadow text-red-600' : 'text-gray-500 hover:text-gray-900'}`}>Critique</button>
+                            <button onClick={() => { setViewMode('improved'); setActiveCritique(null); }} className={`px-4 py-2 rounded-md transition-all ${viewMode === 'improved' ? 'bg-indigo-600 shadow text-white' : 'text-gray-500 hover:text-gray-900'}`}>Improved</button>
+                        </div>
+                    </nav>
+
+                    <div>
+                        <section className={`transition-all duration-500 ${viewMode === 'original' ? 'bg-gray-200 py-24' : 'bg-gradient-to-br from-blue-600 to-indigo-700 py-28 shadow-xl'}`}>
+                            <div className="max-w-4xl mx-auto px-6 text-center">
+                                {viewMode === 'original' ? (
+                                    <div className="fade-in space-y-8">
+                                        <div className="text-5xl font-brand font-bold text-gray-800 leading-tight">
+                                            <Highlight id="headline" activeId={activeCritique} onSelect={setActiveCritique} critiques={critiques}>We Provide Solutions For Your Business Growth</Highlight>
+                                        </div>
+                                        <div className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed font-sans">
+                                            <Highlight id="subhead" activeId={activeCritique} onSelect={setActiveCritique} critiques={critiques}>Leverage our synergy to optimize your workflow and increase ROI effectively.</Highlight>
+                                        </div>
+                                        <div className="flex justify-center gap-4 mt-10">
+                                            <Highlight id="cta" activeId={activeCritique} onSelect={setActiveCritique} critiques={critiques}>
+                                                <div className="flex gap-4">
+                                                    <button className="bg-gray-800 text-white px-8 py-3 rounded uppercase tracking-widest text-sm pointer-events-none font-brand">Learn More</button>
+                                                    <button className="bg-transparent border-2 border-gray-800 text-gray-800 px-8 py-3 rounded uppercase tracking-widest text-sm pointer-events-none font-brand">Contact Sales</button>
+                                                </div>
+                                            </Highlight>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="fade-in space-y-8">
+                                        <div className="inline-block px-4 py-1 rounded-full bg-indigo-500/30 border border-indigo-400/50 text-indigo-100 text-sm font-medium mb-4 font-sans">🚀 New: AI-Powered Reporting</div>
+                                        <h1 className="text-6xl font-extrabold text-white tracking-tight leading-tight font-brand">{improvedContent.headline}</h1>
+                                        <p className="text-xl text-indigo-100 max-w-2xl mx-auto font-sans">{improvedContent.subhead}</p>
+                                        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-10">
+                                            <button className="bg-white text-indigo-600 px-8 py-4 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center gap-2 font-brand">Start Free Trial <Icons.ArrowRight /></button>
+                                            <button className="text-indigo-100 hover:text-white underline underline-offset-4 font-brand">See Live Demo</button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </section>
+
+                        <section className={`transition-all duration-500 border-b border-gray-200 ${viewMode === 'original' ? 'bg-gray-100 py-20' : 'bg-white py-24'}`}>
+                            <div className="max-w-6xl mx-auto px-6">
+                                {viewMode === 'original' ? (
+                                    <div className="text-center max-w-2xl mx-auto fade-in">
+                                        <h2 className="text-2xl font-bold mb-4 text-gray-800 font-brand">Our Features</h2>
+                                        <div className="text-gray-600 leading-loose text-justify bg-white p-8 shadow-sm border border-gray-200 text-lg font-sans">
+                                            <Highlight id="features" activeId={activeCritique} onSelect={setActiveCritique} critiques={critiques}>We have cloud integration, API access, 24/7 support, multi-user login, and data export capabilities. Our system is robust and secure.</Highlight>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="fade-in">
+                                        <div className="text-center mb-16">
+                                            <h2 className="text-3xl font-bold text-gray-900 font-brand">Everything you need to scale</h2>
+                                        </div>
+                                        <div className="grid md:grid-cols-3 gap-8">
+                                            {improvedContent.features.map((f, i) => (
+                                                <div key={i} className="bg-white p-8 rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-shadow">
+                                                    <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center mb-6">
+                                                        {f.icon === 'Zap' && <Icons.Zap />}
+                                                        {f.icon === 'Check' && <Icons.Check />}
+                                                        {f.icon === 'MessageCircle' && <Icons.MessageCircle />}
+                                                    </div>
+                                                    <h3 className="text-xl font-bold text-gray-900 mb-2 font-brand">{f.title}</h3>
+                                                    <p className="text-gray-500 font-sans">{f.desc}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- MAIN PORTFOLIO COMPONENT ---
+        const Portfolio = ({ onNavigate }) => {
+            const [dropdownOpen, setDropdownOpen] = useState(false);
+            const dropdownRef = React.useRef(null);
+
+            useEffect(() => {
+                const handleClickOutside = (event) => {
+                    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                        setDropdownOpen(false);
+                    }
+                };
+                document.addEventListener("mousedown", handleClickOutside);
+                return () => document.removeEventListener("mousedown", handleClickOutside);
+            }, []);
+
+            const projects = [
+                {
+                    id: 'business-reportr',
+                    title: "Business Reportr",
+                    category: "SaaS Landing Page Teardown",
+                    status: "Completed",
+                    image: "https://placehold.co/600x400/e2e8f0/64748b?text=Business+Reportr",
+                    summary: "Analyzed the hero section clarity and CTA hierarchy. Improved conversion focus through copy optimization.",
+                },
+                {
+                    id: 'fintech',
+                    title: "FinTech Hero",
+                    category: "Mobile App Case Study",
+                    status: "Coming Soon",
+                    image: "https://placehold.co/600x400/f3f4f6/9ca3af?text=Coming+Soon",
+                    summary: "Deep dive into trust signals and social proof placement for a banking app.",
+                },
+                {
+                    id: 'ecom',
+                    title: "E-Com Boost",
+                    category: "Shopify Plugin Audit",
+                    status: "Coming Soon",
+                    image: "https://placehold.co/600x400/eff6ff/93c5fd?text=Planned",
+                    summary: "Teardown of a high-traffic plugin page focusing on feature-benefit mapping.",
+                }
+            ];
+
+            return (
+                <div className="min-h-screen pb-20">
+                    {/* Header */}
+                    <header className="bg-white/80 backdrop-blur border-b border-gray-200 sticky top-0 z-30">
+                        <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+                            <div className="flex items-center gap-3">
+                                <img src={config.authorImage} alt={config.authorName} className="w-12 h-12 rounded-full border-2 border-white shadow-sm object-cover" />
+                                <div className="flex flex-col">
+                                    <span className="font-bold text-gray-900 leading-tight">{config.authorName}</span>
+                                    <span className="text-xs text-gray-500 font-medium">{config.authorRole}</span>
+                                </div>
+                            </div>
+
+                            {/* My Projects Dropdown */}
+                            <div className="relative" ref={dropdownRef}>
+                                <button 
+                                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold border transition-all ${dropdownOpen ? 'bg-gray-50 border-gray-300' : 'bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50'}`}
+                                >
+                                    My Projects
+                                    <div className={`transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}>
+                                        <Icons.ChevronDown />
+                                    </div>
+                                </button>
+
+                                {dropdownOpen && (
+                                    <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 fade-in z-50">
+                                        <a href={config.links.portfolio} target="_blank" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                                            <Icons.FileText /> Portfolio
+                                        </a>
+                                        <button onClick={() => setDropdownOpen(false)} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-900 bg-gray-50 font-medium">
+                                            <Icons.BarChart /> Case Studies
+                                        </button>
+                                        <a href="#" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                                            <Icons.BookOpen /> Resources
+                                        </a>
+                                        <a href={config.links.substack} target="_blank" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                                            <Icons.PenTool /> Latest Content
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Main Content (Hero Removed) */}
+                    <main className="max-w-6xl mx-auto px-6 pt-12 pb-12">
+                        
+                        <div className="pt-8">
+                            <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-8">Case Studies</h2>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {projects.map((p) => (
+                                    <div key={p.id} className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group flex flex-col h-full">
+                                        <div className="h-48 overflow-hidden relative bg-gray-100">
+                                            <img src={p.image} alt={p.title} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" />
+                                            {p.status === 'Completed' && (
+                                                <div className="absolute top-3 right-3 bg-white/95 backdrop-blur px-2.5 py-0.5 rounded-full text-[10px] font-bold text-green-700 shadow-sm border border-gray-100 uppercase tracking-wide">
+                                                    Available
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="p-6 flex-1 flex flex-col">
+                                            <div className="text-[10px] font-bold text-indigo-600 uppercase tracking-wide mb-2">{p.category}</div>
+                                            <h3 className="font-bold text-xl text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors">{p.title}</h3>
+                                            <p className="text-gray-600 text-sm leading-relaxed mb-6 flex-1">{p.summary}</p>
+                                            
+                                            {p.status === 'Completed' ? (
+                                                <button 
+                                                    onClick={() => onNavigate(p.id)}
+                                                    className="w-full py-3 rounded-lg border-2 border-gray-900 text-gray-900 font-bold hover:bg-gray-900 hover:text-white transition-all text-sm"
+                                                >
+                                                    View Teardown
+                                                </button>
+                                            ) : (
+                                                <button disabled className="w-full py-3 rounded-lg bg-gray-50 text-gray-400 font-bold cursor-not-allowed text-sm">
+                                                    Coming Soon
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="text-center py-10 border-t border-gray-200 mt-10">
+                        <div className="flex justify-center gap-6 mb-6">
+                            <a href={config.links.linkedin} target="_blank" className="text-gray-400 hover:text-[#0077b5] hover:scale-110 transition-all">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                            </a>
+                            <a href={config.links.x} target="_blank" className="text-gray-400 hover:text-black hover:scale-110 transition-all">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                            </a>
+                        </div>
+                        <p className="text-sm text-gray-400">© 2026 Segun Falade</p>
+                    </footer>
+                </div>
+            );
+        };
+
+        // --- MAIN APP SHELL ---
+        const App = () => {
+            const [currentView, setCurrentView] = useState('portfolio');
+
+            // Scroll to top when view changes
+            useEffect(() => {
+                window.scrollTo(0, 0);
+            }, [currentView]);
+
+            const renderContent = () => {
+                switch(currentView) {
+                    case 'portfolio':
+                        return <Portfolio onNavigate={setCurrentView} />;
+                    case 'business-reportr':
+                        return <TeardownBusinessReportr onBack={() => setCurrentView('portfolio')} />;
+                    default:
+                        return <Portfolio onNavigate={setCurrentView} />;
+                }
+            };
+
+            return (
+                <div>
+                    {renderContent()}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
